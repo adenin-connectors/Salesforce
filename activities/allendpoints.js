@@ -3,7 +3,6 @@
 const cfActivity = require('@adenin/cf-activity');
 const api = require('./common/api');
 
-let salesforceDomain = null;
 module.exports = async function (activity) {
 
   try {
@@ -15,8 +14,6 @@ module.exports = async function (activity) {
       return;
     }
 
-    salesforceDomain = api.getDomain();
-
     activity.Response.Data = getEndpoints(response);
   } catch (error) {
 
@@ -27,6 +24,8 @@ module.exports = async function (activity) {
 function getEndpoints(response) {
   let items = [];
   let endpoints = Object.entries(response.body);
+
+  let salesforceDomain = api.getDomain();
 
   for (let i = 0; i < endpoints.length; i++) {
     let raw = endpoints[i];
