@@ -8,7 +8,7 @@ module.exports = async function (activity) {
   try {
     api.initialize(activity);
 
-    const response = await api('');
+    const response = await api.getEndpoints();
 
     if (!cfActivity.isResponseOk(activity, response)) {
       return;

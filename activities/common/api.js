@@ -5,6 +5,14 @@ const HttpAgent = require('agentkeepalive');
 const HttpsAgent = HttpAgent.HttpsAgent;
 
 let _activity = null;
+let freshdeskDomain = null;
+api.getEndpoints = function () {
+  freshdeskDomain = _activity.Context.connector.custom1.replace('https://','');
+  freshdeskDomain = freshdeskDomain.replace('/','');
+  
+  return api('');
+}
+
 
 function api(path, opts) {
   if (typeof path !== 'string') {
@@ -14,7 +22,7 @@ function api(path, opts) {
   opts = Object.assign({
     json: true,
     token: _activity.Context.connector.token,
-    endpoint: `https://${_activity.Context.connector.custom1}/services/data/v26.0/`,
+    endpoint: `https://${freshdeskDomain}/services/data/v26.0/`,
     agent: {
       http: new HttpAgent(),
       https: new HttpsAgent()
@@ -50,7 +58,7 @@ api.convertResponse = function (response) {
     let raw = endpoints[i];
     let item = {
       name: raw[0],
-      url: `https://${_activity.Context.connector.custom1}/services/data/v26.0/${raw[0]}`,
+      url: `https://${freshdeskDomain}/services/data/v26.0/${raw[0]}`,
       raw: raw
     };
 

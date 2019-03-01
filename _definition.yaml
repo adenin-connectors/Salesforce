@@ -15,8 +15,8 @@ XML2JSON: hide
 ImpersonateOAuth: required
 Interface: hide
 Custom1: required
-Custom1Label: Salesforce Domain
-Custom1Hint: ''
+Custom1Label: Salesforce API Url e.g. 'https://yourdomain.salesforce.com'
+Custom1Hint: 'https://yourdomain.salesforce.com'
 Custom2: hide
 Custom2Label: Custom Field 2
 Custom3: hide
