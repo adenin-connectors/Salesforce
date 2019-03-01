@@ -5,24 +5,18 @@ const HttpAgent = require('agentkeepalive');
 const HttpsAgent = HttpAgent.HttpsAgent;
 
 let _activity = null;
-let salesforceDomain = null;
-
-api.getEndpoints = function () {
-  salesforceDomain = _activity.Context.connector.custom1.replace('https://', '');
-  salesforceDomain = salesforceDomain.replace('/', '');
-
-  return api('');
-};
 
 function api(path, opts) {
   if (typeof path !== 'string') {
     return Promise.reject(new TypeError(`Expected \`path\` to be a string, got ${typeof path}`));
   }
 
+  let salesforceDomain = api.getDomain();
+
   opts = Object.assign({
     json: true,
     token: _activity.Context.connector.token,
-    endpoint: `https://${salesforceDomain}/services/data/v26.0/`,
+    endpoint: `https://${salesforceDomain}/services/data`,
     agent: {
       http: new HttpAgent(),
       https: new HttpsAgent()
@@ -49,31 +43,7 @@ function api(path, opts) {
     throw err;
   });
 }
-// convert response from /issues endpoint to 
-api.convertResponse = function (response) {
-  let items = [];
-  let endpoints = Object.entries(response.body);
 
-  for (let i = 0; i < endpoints.length; i++) {
-    let raw = endpoints[i];
-    let item = {
-      name: raw[0],
-      url: `https://${salesforceDomain}/services/data/v26.0/${raw[0]}`,
-      raw: raw
-    };
-
-    if (raw[0] == 'identity') {
-      item = {
-        ...item,
-        link: raw[1]
-      };
-    }
-
-    items.push(item);
-  }
-
-  return { items: items };
-};
 const helpers = [
   'get',
   'post',
@@ -90,6 +60,17 @@ api.stream = (url, opts) => apigot(url, Object.assign({}, opts, {
 
 api.initialize = function (activity) {
   _activity = activity;
+};
+//** returns Salesforce domain in correct format */
+api.getDomain = function () {
+  let domain = _activity.Context.connector.custom1;
+  domain = domain.replace('https://', '');
+  domain = domain.replace('/', '');
+
+  if (!domain.includes('.salesforce.com')) {
+    domain += '.salesforce.com';
+  }
+  return domain;
 }
 
 for (const x of helpers) {
