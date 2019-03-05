@@ -17,10 +17,10 @@ module.exports = async function (activity) {
     activity.Response.Data = getEndpoints(response);
   } catch (error) {
 
-    cfActivity.handleError(error, activity);
+    cfActivity.handleError(activity, error);
   }
 };
-
+//**maps response data to items */
 function getEndpoints(response) {
   let items = [];
   let endpoints = Object.entries(response.body);
