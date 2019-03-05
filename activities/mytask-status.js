@@ -39,7 +39,7 @@ module.exports = async (activity) => {
     } else {
       taskStatus = {
         ...taskStatus,
-        description: `You have no tasks today.`,
+        description: `You have no tasks.`,
         actionable: false
       };
     }

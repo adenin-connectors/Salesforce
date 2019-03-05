@@ -39,7 +39,6 @@ function api(path, opts) {
   }
 
   return got(url, opts).catch(err => {
-
     throw err;
   });
 }
