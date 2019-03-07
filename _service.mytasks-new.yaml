@@ -1,0 +1,8 @@
+ServiceName: 'mytasks-new'
+InterfaceName: 'status'
+Description: 'My New Tasks'
+APIDoc: ''
+Interfaces: 'daterange'
+RequiredScopes: ''
+AdditionalParameters:
+Method: ''

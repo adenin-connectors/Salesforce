@@ -1,0 +1,8 @@
+ServiceName: 'myleads-new'
+InterfaceName: 'status'
+Description: 'My New Leads'
+APIDoc: ''
+Interfaces: 'daterange'
+RequiredScopes: ''
+AdditionalParameters:
+Method: ''
