@@ -7,7 +7,8 @@ module.exports = async (activity) => {
   try {
     api.initialize(activity);
     var dateRange = cfActivity.dateRange(activity, "today");
-    const response = await api(`/v26.0/query?q=SELECT CreatedDate FROM lead WHERE CreatedDate > ${dateRange.startDate}`);
+    const response = await api(`/v26.0/query?q=SELECT CreatedDate FROM lead 
+    WHERE CreatedDate > ${dateRange.startDate} & CreatedDate < ${dateRange.endDate}`);
 
     if (!cfActivity.isResponseOk(activity, response)) {
       return;
