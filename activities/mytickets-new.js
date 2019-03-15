@@ -8,7 +8,7 @@ module.exports = async (activity) => {
     api.initialize(activity);
 
     var dateRange = cfActivity.dateRange(activity, "today");
-    
+
     const response = await api(`/v26.0/query?q=SELECT CreatedDate FROM case 
     WHERE CreatedDate > ${dateRange.startDate} & CreatedDate < ${dateRange.endDate}`);
 
@@ -24,7 +24,7 @@ module.exports = async (activity) => {
     let salesforceDomain = api.getDomain();
 
     let ticketStatus = {
-      title: 'Active Tickets',
+      title: 'New Tickets',
       url: `https://${salesforceDomain}/lightning/o/Case/list?filterName=Recent`,
       urlLabel: 'All tickets',
     };

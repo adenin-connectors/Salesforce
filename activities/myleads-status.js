@@ -7,7 +7,7 @@ module.exports = async (activity) => {
   try {
     api.initialize(activity);
 
-    const response = await api('/v26.0/sobjects/lead');
+    const response = await api('/v26.0/query?q=SELECT FirstName FROM lead');
 
     if (!cfActivity.isResponseOk(activity, response)) {
       return;
