@@ -7,7 +7,8 @@ module.exports = async function (activity) {
   try {
     api.initialize(activity);
 
-    const response = await api(`/v40.0/query?q=SELECT Id,FirstName,LastName FROM lead`);
+    let url = `/v40.0/query?q=SELECT Id,FirstName,LastName FROM lead`;
+    const response = await api.sendRequestWithPagination(url);
 
     if (!cfActivity.isResponseOk(activity, response)) {
       return;

@@ -2,6 +2,7 @@
 const got = require('got');
 const isPlainObj = require('is-plain-obj');
 const HttpAgent = require('agentkeepalive');
+const cfActivity = require('@adenin/cf-activity');
 const HttpsAgent = HttpAgent.HttpsAgent;
 
 let _activity = null;
@@ -70,12 +71,22 @@ api.getDomain = function () {
     domain += '.salesforce.com';
   }
   return domain;
-}
+};
 
 for (const x of helpers) {
   const method = x.toUpperCase();
   api[x] = (url, opts) => api(url, Object.assign({}, opts, { method }));
   api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, { method }));
 }
+//**sends request to provided url and pagination using limit and offset*/
+api.sendRequestWithPagination = function (url) {
 
+  let pagination = cfActivity.pagination(_activity);
+  let pageSize = parseInt(pagination.pageSize);
+  let offset = (parseInt(pagination.page) - 1) * pageSize;
+
+  url += `+LIMIT+${pageSize}+OFFSET+${offset}`;
+
+  return api(url);
+};
 module.exports = api;
