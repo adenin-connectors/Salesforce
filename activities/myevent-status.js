@@ -25,7 +25,7 @@ module.exports = async (activity) => {
 
     let eventStatus = {
       title: 'Todays Events',
-      url: `https://${salesforceDomain}/lightning/o/Task/home`,
+      url: `https://${salesforceDomain}/lightning/o/Event/home`,
       urlLabel: 'All Events',
     };
 
