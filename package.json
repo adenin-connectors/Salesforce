@@ -16,7 +16,8 @@
     "got": "^9.6.0",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
-    "koa-router": "^7.4.0"
+    "koa-router": "^7.4.0",
+    "moment-timezone": "^0.5.23"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"

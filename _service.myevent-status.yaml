@@ -1,0 +1,8 @@
+ServiceName: 'myevent-status'
+InterfaceName: 'status'
+Description: 'My Event Status'
+APIDoc: ''
+Interfaces: ''
+RequiredScopes: ''
+AdditionalParameters:
+Method: ''

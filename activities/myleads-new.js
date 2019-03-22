@@ -1,5 +1,4 @@
 'use strict';
-
 const cfActivity = require('@adenin/cf-activity');
 const api = require('./common/api');
 
@@ -10,7 +9,7 @@ module.exports = async (activity) => {
     var dateRange = cfActivity.dateRange(activity, "today");
 
     const response = await api(`/v26.0/query?q=SELECT CreatedDate FROM lead 
-    WHERE CreatedDate > ${dateRange.startDate} & CreatedDate < ${dateRange.endDate}`);
+    WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.startDate}`);
 
     if (!cfActivity.isResponseOk(activity, response)) {
       return;
