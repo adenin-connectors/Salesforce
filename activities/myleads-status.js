@@ -1,16 +1,11 @@
 'use strict';
-const cfActivity = require('@adenin/cf-activity');
 const api = require('./common/api');
 
 module.exports = async (activity) => {
   try {
-    api.initialize(activity);
-
     const response = await api('/v26.0/query?q=SELECT FirstName FROM lead');
 
-    if (!cfActivity.isResponseOk(activity, response)) {
-      return;
-    }
+    if (Activity.isErrorResponse(response)) return;
 
     let leads = [];
     if (response.body.recentItems) {
@@ -20,17 +15,17 @@ module.exports = async (activity) => {
     let salesforceDomain = api.getDomain();
 
     let leadsStatus = {
-      title: 'Active Leads',
+      title: T('Active Leads'),
       url: `https://${salesforceDomain}/lightning/o/Lead/list`,
-      urlLabel: 'All Leads',
+      urlLabel: T('All Leads')
     };
 
     let leadsCount = leads.length;
-
+    
     if (leadsCount != 0) {
       leadsStatus = {
         ...leadsStatus,
-        description: `You have ${leadsCount > 1 ? leadsCount + " leads" : leadsCount + " lead"}.`,
+        description: leadsCount > 1 ? T("You have {0} leads.", leadsCount) : T("You have 1 lead."),
         color: 'blue',
         value: leadsCount,
         actionable: true
@@ -38,13 +33,13 @@ module.exports = async (activity) => {
     } else {
       leadsStatus = {
         ...leadsStatus,
-        description: `You have no leads.`,
+        description: T(`You have no leads.`),
         actionable: false
       };
     }
 
     activity.Response.Data = leadsStatus;
   } catch (error) {
-    cfActivity.handleError(activity, error);
+    Activity.handleError(error);
   }
 };

@@ -1,11 +1,7 @@
 'use strict';
 const got = require('got');
-const isPlainObj = require('is-plain-obj');
 const HttpAgent = require('agentkeepalive');
-const cfActivity = require('@adenin/cf-activity');
 const HttpsAgent = HttpAgent.HttpsAgent;
-
-let _activity = null;
 
 function api(path, opts) {
   if (typeof path !== 'string') {
@@ -16,7 +12,7 @@ function api(path, opts) {
 
   opts = Object.assign({
     json: true,
-    token: _activity.Context.connector.token,
+    token: Activity.Context.connector.token,
     endpoint: `https://${salesforceDomain}/services/data`,
     agent: {
       http: new HttpAgent(),
@@ -58,12 +54,9 @@ api.stream = (url, opts) => apigot(url, Object.assign({}, opts, {
   stream: true
 }));
 
-api.initialize = function (activity) {
-  _activity = activity;
-};
 //** returns Salesforce domain in correct format */
 api.getDomain = function () {
-  let domain = _activity.Context.connector.custom1;
+  let domain = Activity.Context.connector.custom1;
   domain = domain.replace('https://', '');
   domain = domain.replace('/', '');
 
@@ -81,7 +74,7 @@ for (const x of helpers) {
 //**sends request to provided url and pagination using limit and offset*/
 api.sendRequestWithPagination = function (url) {
 
-  let pagination = cfActivity.pagination(_activity);
+  let pagination = Activity.pagination();
   let pageSize = parseInt(pagination.pageSize);
   let offset = (parseInt(pagination.page) - 1) * pageSize;
 

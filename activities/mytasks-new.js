@@ -1,19 +1,14 @@
 'use strict';
-const cfActivity = require('@adenin/cf-activity');
 const api = require('./common/api');
 
 module.exports = async (activity) => {
   try {
-    api.initialize(activity);
-
-    var dateRange = cfActivity.dateRange(activity, "today");
+    var dateRange = Activity.dateRange("today");
 
     const response = await api(`/v26.0/query?q=SELECT CreatedDate FROM task 
     WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate}`);
 
-    if (!cfActivity.isResponseOk(activity, response)) {
-      return;
-    }
+    if (Activity.isErrorResponse(response)) return;
 
     let tasks = [];
     if (response.body.records) {
@@ -23,9 +18,9 @@ module.exports = async (activity) => {
     let salesforceDomain = api.getDomain();
 
     let taskStatus = {
-      title: 'New Tasks',
+      title: T('New Tasks'),
       url: `https://${salesforceDomain}/lightning/o/Task/home`,
-      urlLabel: 'All tasks',
+      urlLabel: T('All Tasks')
     };
 
     let taskCount = tasks.length;
@@ -33,7 +28,7 @@ module.exports = async (activity) => {
     if (taskCount != 0) {
       taskStatus = {
         ...taskStatus,
-        description: `You have ${taskCount > 1 ? taskCount + " new tasks" : taskCount + " new task"}.`,
+        description: taskCount > 1 ? T("You have {0} new tasks.", taskCount) : T("You have 1 new task."),
         color: 'blue',
         value: taskCount,
         actionable: true
@@ -41,13 +36,13 @@ module.exports = async (activity) => {
     } else {
       taskStatus = {
         ...taskStatus,
-        description: `You have no new tasks.`,
+        description: T(`You have no new tasks.`),
         actionable: false
       };
     }
 
     activity.Response.Data = taskStatus;
   } catch (error) {
-    cfActivity.handleError(activity, error);
+    Activity.handleError(error);
   }
 };

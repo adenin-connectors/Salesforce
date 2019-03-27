@@ -1,16 +1,11 @@
 'use strict';
-const cfActivity = require('@adenin/cf-activity');
 const api = require('./common/api');
 
 module.exports = async (activity) => {
   try {
-    api.initialize(activity);
-
     const response = await api('/v26.0/sobjects/task');
 
-    if (!cfActivity.isResponseOk(activity, response)) {
-      return;
-    }
+    if (Activity.isErrorResponse(response)) return;
 
     let tasks = [];
     if (response.body.recentItems) {
@@ -20,17 +15,17 @@ module.exports = async (activity) => {
     let salesforceDomain = api.getDomain();
 
     let taskStatus = {
-      title: 'Active Tasks',
+      title: T('Active Tasks'),
       url: `https://${salesforceDomain}/lightning/o/Task/home`,
-      urlLabel: 'All tasks',
+      urlLabel: T('All Tasks')
     };
 
     let taskCount = tasks.length;
-
+    
     if (taskCount != 0) {
       taskStatus = {
         ...taskStatus,
-        description: `You have ${taskCount > 1 ? taskCount + " tasks" : taskCount + " task"}.`,
+        description: taskCount > 1 ? T("You have {0} tasks.", taskCount) : T("You have 1 task."),
         color: 'blue',
         value: taskCount,
         actionable: true
@@ -38,13 +33,13 @@ module.exports = async (activity) => {
     } else {
       taskStatus = {
         ...taskStatus,
-        description: `You have no tasks.`,
+        description: T(`You have no tasks.`),
         actionable: false
       };
     }
 
     activity.Response.Data = taskStatus;
   } catch (error) {
-    cfActivity.handleError(activity, error);
+    Activity.handleError(error);
   }
 };
