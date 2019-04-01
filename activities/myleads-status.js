@@ -16,8 +16,8 @@ module.exports = async (activity) => {
 
     let leadsStatus = {
       title: T('Active Leads'),
-      url: `https://${salesforceDomain}/lightning/o/Lead/list`,
-      urlLabel: T('All Leads')
+      link: `https://${salesforceDomain}/lightning/o/Lead/list`,
+      linkLabel: T('All Leads')
     };
 
     let leadsCount = leads.length;

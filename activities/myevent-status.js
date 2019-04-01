@@ -20,8 +20,8 @@ module.exports = async (activity) => {
 
     let eventStatus = {
       title: T('Events Today'),
-      url: `https://${salesforceDomain}/lightning/o/Event/home`,
-      urlLabel: T('All events')
+      link: `https://${salesforceDomain}/lightning/o/Event/home`,
+      linkLabel: T('All events')
     };
 
     let eventCount = events.length;
@@ -31,7 +31,7 @@ module.exports = async (activity) => {
 
       let eventFormatedTime = getEventFormatedTimeAsString(nextEvent);
       let eventPluralorNot = eventCount > 1 ? T("events scheduled") : T("event scheduled");
-      let description = T(`You have {0} {1} today. The next event '{2}' starts{3}`, eventCount, eventPluralorNot, nextEvent.Subject, eventFormatedTime);
+      let description = T(`You have {0} {1} today. The next event '{2}' starts {3}`, eventCount, eventPluralorNot, nextEvent.Subject, eventFormatedTime);
 
       eventStatus = {
         ...eventStatus,
@@ -96,13 +96,13 @@ function getEventFormatedTimeAsString(nextEvent) {
     let momentDate = '';
     if (diffInDays == 1) {
       //events that start tomorrow
-      datePrefix = ' tomorrow';
+      datePrefix = 'tomorrow ';
     } else if (diffInDays > 1) {
       //events that start day after tomorrow and later
-      datePrefix = ' on ';
-      momentDate = eventTime.format('LL');
+      datePrefix = 'on ';
+      momentDate = eventTime.format('LL') + " ";
     }
 
-    return T(`{0}{1}{2}{3}.`, T(datePrefix), momentDate, T(" at "), eventTime.format('LT'));
+    return T(`{0}{1}{2}{3}.`, T(datePrefix), momentDate, T("at "), eventTime.format('LT'));
   }
 }

@@ -16,8 +16,8 @@ module.exports = async (activity) => {
 
     let taskStatus = {
       title: T('Active Tasks'),
-      url: `https://${salesforceDomain}/lightning/o/Task/home`,
-      urlLabel: T('All Tasks')
+      link: `https://${salesforceDomain}/lightning/o/Task/home`,
+      linkLabel: T('All Tasks')
     };
 
     let taskCount = tasks.length;

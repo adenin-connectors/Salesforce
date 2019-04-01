@@ -1,5 +1,8 @@
 'use strict';
 const api = require('./common/api');
+const path = require('path');
+const yaml = require('js-yaml');
+const fs = require('fs');
 
 module.exports = async (activity) => {
   try {
@@ -22,11 +25,13 @@ module.exports = async (activity) => {
           json: true,
           body: {
             Subject: form.subject,
-            Description: form.description
+            Description: form.description,
+            ActivityDate: form.duetime,
+            Priority: form.priority
           }
         });
-
-        var comment = "Task created";
+        
+        var comment = T("Task {0} created",response.body.id);
         data = getObjPath(activity.Request, "Data.model");
         data._action = {
           response: {
@@ -37,14 +42,26 @@ module.exports = async (activity) => {
         break;
 
       default:
-        // initialize form subject with query parameter (if provided)
-        if (activity.Request.Query && activity.Request.Query.query) {
-          data = {
-            form: {
-              subject: activity.Request.Query.query
-            }
+      var fname = __dirname + path.sep + "common" + path.sep + "task-create.form";
+      var schema = yaml.safeLoad(fs.readFileSync(fname, 'utf8'));
+
+      data.title = T("Create Salesforce Task");
+      data.formSchema = schema;
+      // initialize form subject with query parameter (if provided)
+      if (activity.Request.Query && activity.Request.Query.query) {
+        data = {
+          form: {
+            subject: activity.Request.Query.query
           }
         }
+      }
+      data._actionList = [{
+        id: "create",
+        label: T("Create Task"),
+        settings: {
+          actionType: "a"
+        }
+      }];
         break;
     }
 

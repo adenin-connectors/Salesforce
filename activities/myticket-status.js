@@ -16,8 +16,8 @@ module.exports = async (activity) => {
 
     let ticketStatus = {
       title: T('Open Tickets'),
-      url: `https://${salesforceDomain}/lightning/o/Case/list?filterName=Recent`,
-      urlLabel: T('All tickets'),
+      link: `https://${salesforceDomain}/lightning/o/Case/list?filterName=Recent`,
+      linkLabel: T('All tickets')
     };
 
     let ticketCount = tickets.length;
