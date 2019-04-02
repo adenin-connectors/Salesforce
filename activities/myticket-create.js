@@ -21,17 +21,17 @@ module.exports = async (activity) => {
       case "create":
       case "submit":
         const form = _action.form;
-        var response = await api.post("/v26.0/sobjects/task", {
+        var response = await api.post("/v39.0/sobjects/Case", {
           json: true,
           body: {
             Subject: form.subject,
             Description: form.description,
-            ActivityDate: form.duetime,
-            Priority: form.priority
+            Priority: form.priority,
+            Origin: form.origin
           }
         });
 
-        var comment = T("Task {0} created", response.body.id);
+        var comment = T("Ticket {0} created", response.body.id);
         data = getObjPath(activity.Request, "Data.model");
         data._action = {
           response: {
@@ -42,10 +42,10 @@ module.exports = async (activity) => {
         break;
 
       default:
-        var fname = __dirname + path.sep + "common" + path.sep + "task-create.form";
+        var fname = __dirname + path.sep + "common" + path.sep + "ticket-create.form";
         var schema = yaml.safeLoad(fs.readFileSync(fname, 'utf8'));
 
-        data.title = T("Create Salesforce Task");
+        data.title = T("Create Salesforce Ticket");
         data.formSchema = schema;
         // initialize form subject with query parameter (if provided)
         if (activity.Request.Query && activity.Request.Query.query) {
@@ -57,7 +57,7 @@ module.exports = async (activity) => {
         }
         data._actionList = [{
           id: "create",
-          label: T("Create Task"),
+          label: T("Create Ticket"),
           settings: {
             actionType: "a"
           }

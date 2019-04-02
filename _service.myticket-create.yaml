@@ -1,6 +1,6 @@
-ServiceName: 'mytask-create'
+ServiceName: 'myticket-create'
 InterfaceName: 'create'
-Description: 'Create New Task'
+Description: 'Create New Ticket'
 APIDoc: ''
 Interfaces: 'search,pagination'
 RequiredScopes: ''

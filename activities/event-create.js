@@ -5,6 +5,7 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 
 module.exports = async (activity) => {
+
   try {
     var data = {};
 
@@ -21,17 +22,20 @@ module.exports = async (activity) => {
       case "create":
       case "submit":
         const form = _action.form;
-        var response = await api.post("/v26.0/sobjects/task", {
+        let endDateTime = new Date(form.startdatetime);
+        endDateTime.setMinutes(endDateTime.getMinutes() + parseInt(form.duration));
+        var response = await api.post("/v39.0/sobjects/Event", {
           json: true,
           body: {
             Subject: form.subject,
             Description: form.description,
-            ActivityDate: form.duetime,
-            Priority: form.priority
+            StartDateTime: form.startdatetime,
+            EndDateTime: endDateTime.toISOString()
           }
         });
 
-        var comment = T("Task {0} created", response.body.id);
+
+        var comment = T("Event {0} created", response.body.id);
         data = getObjPath(activity.Request, "Data.model");
         data._action = {
           response: {
@@ -42,10 +46,10 @@ module.exports = async (activity) => {
         break;
 
       default:
-        var fname = __dirname + path.sep + "common" + path.sep + "task-create.form";
+        var fname = __dirname + path.sep + "common" + path.sep + "event-create.form";
         var schema = yaml.safeLoad(fs.readFileSync(fname, 'utf8'));
 
-        data.title = T("Create Salesforce Task");
+        data.title = T("Create Salesforce Event");
         data.formSchema = schema;
         // initialize form subject with query parameter (if provided)
         if (activity.Request.Query && activity.Request.Query.query) {
@@ -57,7 +61,7 @@ module.exports = async (activity) => {
         }
         data._actionList = [{
           id: "create",
-          label: T("Create Task"),
+          label: T("Create Event"),
           settings: {
             actionType: "a"
           }
@@ -65,11 +69,8 @@ module.exports = async (activity) => {
         break;
     }
 
-    // copy response data
     activity.Response.Data = data;
-
   } catch (error) {
-    // handle generic exception
     Activity.handleError(error);
   }
 

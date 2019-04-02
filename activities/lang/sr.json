@@ -38,5 +38,11 @@
   "at ": "u ",
   "Task {0} created" : "Zadatak {0} kreiran",
   "Create Salesforce Task" : "Kreiraj Salesforce Zadatak",
-  "Create Task" : "Kreiraj Zadatak"
+  "Create Task" : "Kreiraj Zadatak",
+  "Ticket {0} created" : "Tiket {0} kreiran",
+  "Create Salesforce Ticket" : "Kreiraj Salesforce Tiket",
+  "Create Ticket" : "Kreiraj Tiket",
+  "Event {0} created" : "Događaj {0} kreiran",
+  "Create Salesforce Event" : "Kreiraj Salesforce Događaj",
+  "Create Event" : "Kreiraj Događaj"
 }
