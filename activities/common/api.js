@@ -83,4 +83,48 @@ api.sendRequestWithPagination = function (url) {
   return api(url);
 };
 
+//**maps response to items */
+api.mapTicketsAndTasksToItems = function(responseDataArr,itemName) {
+  let items = [];
+
+  let salesforceDomain = api.getDomain();
+
+  for (let i = 0; i < responseDataArr.length; i++) {
+    let raw = responseDataArr[i];
+
+    let item = {
+      id: raw.Id,
+      title: raw.Subject,
+      description: raw.Description,
+      link: `https://${salesforceDomain}/lightning/r/${itemName}/${raw.Id}/view`,
+      raw: raw
+    };
+    items.push(item);
+  }
+
+  return { items: items };
+};
+
+//**maps response to items */
+api.mapLeadsToItems = function(responseDataArr) {
+  let items = [];
+
+  let salesforceDomain = api.getDomain();
+
+  for (let i = 0; i < responseDataArr.length; i++) {
+    let raw = responseDataArr[i];
+
+    let item = {
+      id: raw.Id,
+      title: raw.FirstName,
+      description: raw.LastName,
+      link: `https://${salesforceDomain}/lightning/r/Lead/${raw.Id}/view`,
+      raw: raw
+    };
+    items.push(item);
+  }
+
+  return { items: items };
+};
+
 module.exports = api;
