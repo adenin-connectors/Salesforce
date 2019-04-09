@@ -3,7 +3,14 @@ const api = require('./common/api');
 
 module.exports = async function (activity) {
   try {
-    let url = `/v40.0/parameterizedSearch/?q=${activity.Request.Query.query}&sobject=Lead` +
+    let query = activity.Request.Query.query;
+    if (query.length < 2) {
+      let items = [];
+      activity.Response.Data.items = items;
+      return;
+    }
+
+    let url = `/v40.0/parameterizedSearch/?q=${query}&sobject=Lead` +
       '&Lead.fields=Id,FirstName,LastName';
     const response = await api(url);
     if (Activity.isErrorResponse(response)) return;
