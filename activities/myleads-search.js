@@ -3,6 +3,8 @@ const api = require('./common/api');
 
 module.exports = async function (activity) {
   try {
+    if (!activity.Request.Query.query) activity.Request.Query.query = "";
+
     let query = activity.Request.Query.query;
     if (query.length < 2) {
       let items = [];
@@ -12,11 +14,12 @@ module.exports = async function (activity) {
 
     let url = `/v40.0/parameterizedSearch/?q=${query}&sobject=Lead` +
       '&Lead.fields=Id,FirstName,LastName';
+    api.initialize(activity);
     const response = await api(url);
-    if (Activity.isErrorResponse(response)) return;
+    if ($.isErrorResponse(activity, response)) return;
 
     activity.Response.Data = api.mapLeadsToItems(response.body.searchRecords);
   } catch (error) {
-    Activity.handleError(error);
+    $.handleError(activity, error);
   }
 };
