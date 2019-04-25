@@ -1,0 +1,8 @@
+ServiceName: 'mytask-search'
+InterfaceName: 'items'
+Description: 'Search Tasks'
+APIDoc: ''
+Interfaces: 'search'
+RequiredScopes: ''
+AdditionalParameters:
+Method: ''

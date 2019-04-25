@@ -5,7 +5,6 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 
 module.exports = async (activity) => {
-
   try {
     var data = {};
 
@@ -24,6 +23,7 @@ module.exports = async (activity) => {
         const form = _action.form;
         let endDateTime = new Date(form.startdatetime);
         endDateTime.setMinutes(endDateTime.getMinutes() + parseInt(form.duration));
+        api.initialize(activity);
         var response = await api.post("/v39.0/sobjects/Event", {
           json: true,
           body: {
@@ -35,7 +35,7 @@ module.exports = async (activity) => {
         });
 
 
-        var comment = T("Event {0} created", response.body.id);
+        var comment = T(activity, "Event {0} created", response.body.id);
         data = getObjPath(activity.Request, "Data.model");
         data._action = {
           response: {
@@ -49,7 +49,7 @@ module.exports = async (activity) => {
         var fname = __dirname + path.sep + "common" + path.sep + "event-create.form";
         var schema = yaml.safeLoad(fs.readFileSync(fname, 'utf8'));
 
-        data.title = T("Create Salesforce Event");
+        data.title = T(activity, "Create Salesforce Event");
         data.formSchema = schema;
         // initialize form subject with query parameter (if provided)
         if (activity.Request.Query && activity.Request.Query.query) {
@@ -61,7 +61,7 @@ module.exports = async (activity) => {
         }
         data._actionList = [{
           id: "create",
-          label: T("Create Event"),
+          label: T(activity, "Create Event"),
           settings: {
             actionType: "a"
           }
@@ -71,7 +71,7 @@ module.exports = async (activity) => {
 
     activity.Response.Data = data;
   } catch (error) {
-    Activity.handleError(error);
+    $.handleError(activity, error);
   }
 
   function getObjPath(obj, path) {

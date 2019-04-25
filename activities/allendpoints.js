@@ -3,14 +3,14 @@ const api = require('./common/api');
 
 module.exports = async function (activity) {
   try {
+    api.initialize(activity);
     const response = await api('/v26.0');
 
-    if (Activity.isErrorResponse(response)) return;
+    if ($.isErrorResponse(activity, response)) return;
 
     activity.Response.Data = getEndpoints(response);
   } catch (error) {
-
-    Activity.handleError(error);
+    $.handleError(activity, error);
   }
 };
 //**maps response data to items */
