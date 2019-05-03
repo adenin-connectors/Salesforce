@@ -1,5 +1,5 @@
 InterfaceName: 'items'
-Description: 'All Tickets'
+Description: 'All Tasks'
 APIDoc: ''
 Interfaces: 'pagination'
 RequiredScopes: ''

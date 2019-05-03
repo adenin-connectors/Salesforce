@@ -4,11 +4,7 @@ const api = require('./common/api');
 module.exports = async function (activity) {
   try {
     api.initialize(activity);
-    const currentUser = await api('/v24.0/chatter/users/me');
-    if ($.isErrorResponse(activity, currentUser)) return;
-
     let url = `/v40.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed FROM case WHERE IsClosed = false`;
-
     const response = await api.sendRequestWithPagination(url);
     if ($.isErrorResponse(activity, response)) return;
 

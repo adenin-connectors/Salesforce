@@ -95,7 +95,6 @@ api.mapTicketsAndTasksToItems = function (responseDataArr, itemName) {
     let raw = responseDataArr[i];
 
     let item = {
-      count: responseDataArr.length,
       id: raw.Id,
       title: raw.Subject,
       description: raw.Description,

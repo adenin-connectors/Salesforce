@@ -4,11 +4,8 @@ const api = require('./common/api');
 module.exports = async (activity) => {
   try {
     api.initialize(activity);
-    const currentUser = await api('/v24.0/chatter/users/me');
-    if ($.isErrorResponse(activity, currentUser)) return;
 
-    const response = await api(`/v40.0/query?q=SELECT IsClosed FROM task 
-    WHERE OwnerId = '${currentUser.body.id}' AND IsClosed = false`);
+    const response = await api(`/v40.0/query?q=SELECT IsClosed FROM task WHERE IsClosed = false`);
     if ($.isErrorResponse(activity, response)) return;
 
     let tasks = [];

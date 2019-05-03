@@ -13,7 +13,7 @@ module.exports = async function (activity) {
     }
     api.initialize(activity);
     let url = `/v40.0/parameterizedSearch/?q=${query}&sobject=Task` +
-      '&Task.fields=Id,Subject,Description';
+      '&Task.fields=Id,Subject,Description,CreatedDate,IsClosed&Task.where=IsClosed=false';
     const response = await api(url);
     if ($.isErrorResponse(activity, response)) return;
 
