@@ -1,8 +1,7 @@
-ServiceName: 'mytask-create'
 InterfaceName: 'create'
 Description: 'Create New Task'
 APIDoc: ''
-Interfaces: 'search,pagination'
+Interfaces: ''
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

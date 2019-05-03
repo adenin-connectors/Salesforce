@@ -1,8 +1,7 @@
-ServiceName: 'mytask-status'
 InterfaceName: 'status'
 Description: 'My Task Status'
 APIDoc: ''
-Interfaces: 'search,pagination'
+Interfaces: ''
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

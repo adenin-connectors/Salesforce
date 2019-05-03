@@ -1,16 +1,16 @@
 'use strict';
 const api = require('./common/api');
 
-module.exports = async function (activity) {
+module.exports = async (activity) => {
   try {
+    var dateRange = $.dateRange(activity, "today");
     api.initialize(activity);
     const currentUser = await api('/v24.0/chatter/users/me');
     if ($.isErrorResponse(activity, currentUser)) return;
 
-    let url = `/v40.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed FROM case 
-    WHERE OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
-
-    const response = await api.sendRequestWithPagination(url);
+    const response = await api.sendRequestWithPagination(`/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
+    FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} 
+    AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`);
     if ($.isErrorResponse(activity, response)) return;
 
     activity.Response.Data.items = api.mapTicketsAndTasksToItems(response.body.records, "Case");

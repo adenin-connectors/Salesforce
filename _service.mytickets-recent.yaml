@@ -1,8 +1,7 @@
-ServiceName: 'mytickets-search'
 InterfaceName: 'items'
-Description: 'Search Tickets'
+Description: 'My Recent Tickets'
 APIDoc: ''
-Interfaces: 'search'
+Interfaces: 'daterange,pagination'
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

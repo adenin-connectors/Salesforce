@@ -1,4 +1,3 @@
-ServiceName: 'myleads-new'
 InterfaceName: 'status'
 Description: 'My New Leads'
 APIDoc: ''

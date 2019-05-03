@@ -14,11 +14,16 @@ module.exports = async function (activity) {
 
     api.initialize(activity);
     let url = `/v40.0/parameterizedSearch/?q=${query}&sobject=Case` +
-      '&Case.fields=Id,Subject,Description';
+      '&Case.fields=Id,Subject,Description,CreatedDate,IsClosed&Case.where=IsClosed=false';
     const response = await api(url);
     if ($.isErrorResponse(activity, response)) return;
 
-    activity.Response.Data = api.mapTicketsAndTasksToItems(response.body.searchRecords, "Case");
+    activity.Response.Data.items = api.mapTicketsAndTasksToItems(response.body.searchRecords, "Case");
+    
+    let salesforceDomain = api.getDomain();
+    activity.Response.Data.title = T(activity, 'Open Tickets');
+    activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Case/list?filterName=Recent`;
+    activity.Response.Data.linkLabel = T(activity, 'All Tickets');
   } catch (error) {
     $.handleError(activity, error);
   }

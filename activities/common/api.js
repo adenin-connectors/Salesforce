@@ -95,16 +95,18 @@ api.mapTicketsAndTasksToItems = function (responseDataArr, itemName) {
     let raw = responseDataArr[i];
 
     let item = {
+      count: responseDataArr.length,
       id: raw.Id,
       title: raw.Subject,
       description: raw.Description,
+      date : new Date(raw.CreatedDate).toISOString(),
       link: `https://${salesforceDomain}/lightning/r/${itemName}/${raw.Id}/view`,
       raw: raw
     };
     items.push(item);
   }
 
-  return { items: items };
+  return { items };
 };
 
 //**maps response to items */

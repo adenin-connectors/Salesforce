@@ -1,4 +1,3 @@
-ServiceName: 'mytask-search'
 InterfaceName: 'items'
 Description: 'Search Tasks'
 APIDoc: ''

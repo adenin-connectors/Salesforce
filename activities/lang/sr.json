@@ -44,5 +44,7 @@
   "Create Ticket": "Kreiraj Tiket",
   "Event {0} created": "Događaj {0} kreiran",
   "Create Salesforce Event": "Kreiraj Salesforce Događaj",
-  "Create Event": "Kreiraj Događaj"
+  "Create Event": "Kreiraj Događaj",
+  "Number Of Tickets" : "Broj Tiketa",
+  "Ticket Metrics By Priority" : "Tiketi Po Prioritetu"
 }

@@ -4,17 +4,17 @@ const api = require('./common/api');
 module.exports = async (activity) => {
   try {
     api.initialize(activity);
-    const response = await api(`/v40.0/query?q=SELECT Priority FROM case`);
+    const response = await api(`/v40.0/query?q=SELECT Priority,IsClosed FROM case WHERE IsClosed = false`);
 
     if ($.isErrorResponse(activity, response)) return;
 
-    activity.Response.Data = mapResponseToChartData(response);
+    activity.Response.Data = mapResponseToChartData(activity,response);
   } catch (error) {
     $.handleError(activity, error);
   }
 };
 //** maps response data to data format usable by chart */
-function mapResponseToChartData(response) {
+function mapResponseToChartData(activity,response) {
   let tickets = response.body.records;
   let priorities = [];
   let datasets = [];
@@ -37,7 +37,7 @@ function mapResponseToChartData(response) {
     }
     data.push(counter);
   }
-  datasets.push({ label: 'Number Of Tickets', data });
+  datasets.push({ label: T(activity,'Number Of Tickets'), data });
 
   let chartData = {
     chart: {
@@ -46,7 +46,7 @@ function mapResponseToChartData(response) {
         options: {
           title: {
             display: true,
-            text: 'Ticket Metrics By Priority'
+            text: T(activity,'Ticket Metrics By Priority')
           }
         }
       },
