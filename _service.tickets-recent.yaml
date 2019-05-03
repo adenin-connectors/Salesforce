@@ -1,0 +1,7 @@
+InterfaceName: 'items'
+Description: 'Recent Tickets'
+APIDoc: ''
+Interfaces: 'daterange,pagination'
+RequiredScopes: ''
+AdditionalParameters:
+Method: ''

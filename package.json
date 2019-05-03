@@ -1,7 +1,7 @@
 {
   "name": "github",
   "version": "1.0.0",
-  "description": "lists all github issues",
+  "description": "Salesforce Connector",
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
