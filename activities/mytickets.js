@@ -7,18 +7,28 @@ module.exports = async function (activity) {
     const currentUser = await api('/v24.0/chatter/users/me');
     if ($.isErrorResponse(activity, currentUser)) return;
 
-    let url = `/v40.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed FROM case 
-    WHERE OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
-
-    const response = await api.sendRequestWithPagination(url);
+    var dateRange = $.dateRange(activity, "today");
+    const response = await api.sendRequestWithPagination(`/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
+    FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} 
+    AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`);
     if ($.isErrorResponse(activity, response)) return;
 
-    activity.Response.Data.items = api.mapTicketsAndTasksToItems(response.body.records, "Case");
-
     let salesforceDomain = api.getDomain();
+    activity.Response.Data.items = api.mapTicketsAndTasksToItems(response.body.records, "Case");
+    let value = activity.Response.Data.items.items.length;
     activity.Response.Data.title = T(activity, 'Open Tickets');
     activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Case/list?filterName=Recent`;
     activity.Response.Data.linkLabel = T(activity, 'All Tickets');
+    activity.Response.Data.actionable = value > 0;
+
+    if (value > 0) {
+      activity.Response.Data.value = value;
+      activity.Response.Data.color = 'blue';
+      activity.Response.Data.description = value > 1 ? T(activity, "You have {0} tickets.", value)
+        : T(activity, "You have 1 ticket.");
+    } else {
+      activity.Response.Data.description = T(activity, `You have no tickets.`);
+    }
   } catch (error) {
     $.handleError(activity, error);
   }
