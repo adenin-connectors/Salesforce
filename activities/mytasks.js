@@ -12,7 +12,7 @@ module.exports = async function (activity) {
     const response = await api.sendRequestWithPagination(url);
     if ($.isErrorResponse(activity, response)) return;
 
-    activity.Response.Data.items = api.mapTicketsAndTasksToItems(response.body.records, "Task");
+    activity.Response.Data.items = api.mapObjectsToItems(response.body.records, "Task");
 
     let salesforceDomain = api.getDomain();
     activity.Response.Data.title = T(activity, 'Active Tasks');

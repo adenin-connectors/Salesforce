@@ -10,7 +10,7 @@ module.exports = async function (activity) {
     FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND IsClosed = false`);
     if ($.isErrorResponse(activity, response)) return;
 
-    activity.Response.Data.items = api.mapTicketsAndTasksToItems(response.body.records, "Case");
+    activity.Response.Data.items = api.mapObjectsToItems(response.body.records, "Case");
     let value = activity.Response.Data.items.items.length;
     let salesforceDomain = api.getDomain();
     activity.Response.Data.title = T(activity, 'Open Tickets');

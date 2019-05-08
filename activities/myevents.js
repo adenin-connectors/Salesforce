@@ -4,52 +4,33 @@ const moment = require('moment-timezone');
 
 module.exports = async (activity) => {
   try {
-    var dateRange = $.dateRange(activity, "today");
-
     api.initialize(activity);
-    const response = await api(`/v26.0/query?q=SELECT StartDateTime,Subject FROM event
+    var dateRange = $.dateRange(activity, "today");
+    const response = await api.sendRequestWithPagination(`/v26.0/query?q=SELECT Id,StartDateTime,CreatedDate,Subject,Description FROM event
      WHERE StartDateTime > ${dateRange.startDate} AND StartDateTime <= ${dateRange.endDate}`);
 
     if ($.isErrorResponse(activity, response)) return;
 
-    let events = [];
-    if (response.body.records) {
-      events = response.body.records;
-    }
+    activity.Response.Data.items = api.mapObjectsToItems(response.body.records,"Event");
+    let value = activity.Response.Data.items.items.length;
+    activity.Response.Data.title = T(activity, 'Events Today');
+    activity.Response.Data.link = `https://${api.getDomain()}/lightning/o/Event/home`;
+    activity.Response.Data.linkLabel = T(activity, 'All events');
+    activity.Response.Data.actionable = value > 0;
 
-    let salesforceDomain = api.getDomain();
+    if (value > 0) {
+      let nextEvent = getNexEvent(response.body.records);
 
-    let eventStatus = {
-      title: T(activity, 'Events Today'),
-      link: `https://${salesforceDomain}/lightning/o/Event/home`,
-      linkLabel: T(activity, 'All events')
-    };
+      let eventFormatedTime = getEventFormatedTimeAsString(activity, nextEvent);
+      let eventPluralorNot = value > 1 ? T(activity, "events scheduled") : T(activity, "event scheduled");
+      let description = T(activity, `You have {0} {1} today. The next event '{2}' starts {3}`, value, eventPluralorNot, nextEvent.Subject, eventFormatedTime);
 
-    let eventCount = events.length;
-
-    if (eventCount != 0) {
-      let nextEvent = getNexEvent(events);
-
-      let eventFormatedTime = getEventFormatedTimeAsString(nextEvent);
-      let eventPluralorNot = eventCount > 1 ? T(activity, "events scheduled") : T(activity, "event scheduled");
-      let description = T(activity, `You have {0} {1} today. The next event '{2}' starts {3}`, eventCount, eventPluralorNot, nextEvent.Subject, eventFormatedTime);
-
-      eventStatus = {
-        ...eventStatus,
-        description: description,
-        color: 'blue',
-        value: eventCount,
-        actionable: true
-      };
+      activity.Response.Data.value = value;
+      activity.Response.Data.color = 'blue';
+      activity.Response.Data.description = description;
     } else {
-      eventStatus = {
-        ...eventStatus,
-        description: T(activity, `You have no events today.`),
-        actionable: false
-      };
+      activity.Response.Data.description = T(activity, `You have no events today.`);
     }
-
-    activity.Response.Data = eventStatus;
   } catch (error) {
     $.handleError(activity, error);
   }
@@ -88,7 +69,7 @@ function getEventFormatedTimeAsString(activity, nextEvent) {
   if (diffInHrs == 0) {
     //events that start in less then 1 hour
     let diffInMins = eventTime.diff(timeNow, 'minutes');
-    return T(activity, ` in {0} minutes.`, diffInMins);
+    return T(activity,`in {0} minutes.`, diffInMins);
   } else {
     //events that start in more than 1 hour
     let diffInDays = eventTime.diff(timeNow, 'days');
@@ -104,6 +85,6 @@ function getEventFormatedTimeAsString(activity, nextEvent) {
       momentDate = eventTime.format('LL') + " ";
     }
 
-    return T(`{0}{1}{2}{3}.`, T(activity, datePrefix), momentDate, T(activity, "at "), eventTime.format('LT'));
+    return T(activity,`{0}{1}{2}{3}.`, T(activity,datePrefix), momentDate, T(activity,"at "), eventTime.format('LT'));
   }
 }

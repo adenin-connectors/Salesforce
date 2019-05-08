@@ -86,7 +86,7 @@ api.sendRequestWithPagination = function (url) {
 };
 
 //**maps response to items */
-api.mapTicketsAndTasksToItems = function (responseDataArr, itemName) {
+api.mapObjectsToItems = function (responseDataArr, itemName) {
   let items = [];
 
   let salesforceDomain = api.getDomain();

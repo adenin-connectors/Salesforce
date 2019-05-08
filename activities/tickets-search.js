@@ -18,7 +18,7 @@ module.exports = async function (activity) {
     const response = await api(url);
     if ($.isErrorResponse(activity, response)) return;
 
-    activity.Response.Data.items = api.mapTicketsAndTasksToItems(response.body.searchRecords, "Case");
+    activity.Response.Data.items = api.mapObjectsToItems(response.body.searchRecords, "Case");
     
     let salesforceDomain = api.getDomain();
     activity.Response.Data.title = T(activity, 'Open Tickets');

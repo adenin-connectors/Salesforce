@@ -17,7 +17,7 @@ module.exports = async function (activity) {
     const response = await api(url);
     if ($.isErrorResponse(activity, response)) return;
 
-    activity.Response.Data = api.mapTicketsAndTasksToItems(response.body.searchRecords, "Task");
+    activity.Response.Data = api.mapObjectsToItems(response.body.searchRecords, "Task");
   } catch (error) {
     $.handleError(activity, error);
   }

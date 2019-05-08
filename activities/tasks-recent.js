@@ -10,7 +10,7 @@ module.exports = async (activity) => {
     FROM task WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND IsClosed = false`);
     if ($.isErrorResponse(activity, response)) return;
 
-    activity.Response.Data.items = api.mapTicketsAndTasksToItems(response.body.records, "Task");
+    activity.Response.Data.items = api.mapObjectsToItems(response.body.records, "Task");
 
     let salesforceDomain = api.getDomain();
     activity.Response.Data.title = T(activity, 'Active Tasks');
