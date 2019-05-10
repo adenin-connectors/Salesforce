@@ -6,20 +6,44 @@ module.exports = async (activity) => {
   try {
     api.initialize(activity);
     var dateRange = $.dateRange(activity, "today");
-    const response = await api.sendRequestWithPagination(`/v26.0/query?q=SELECT Id,StartDateTime,CreatedDate,Subject,Description FROM event
-     WHERE StartDateTime > ${dateRange.startDate} AND StartDateTime <= ${dateRange.endDate}`);
-
+    const limit = 1;
+    let allEvents = [];
+    let url = `/v26.0/query?q=SELECT Id,StartDateTime,CreatedDate,Subject,Description FROM event
+    WHERE StartDateTime > ${new Date(new Date().toUTCString()).toISOString()} AND StartDateTime <= ${dateRange.endDate} ORDER BY StartDateTime ASC LIMIT ${limit}`;
+    const response = await api(url);
     if ($.isErrorResponse(activity, response)) return;
+    allEvents.push(...response.body.records);
 
-    activity.Response.Data.items = api.mapObjectsToItems(response.body.records,"Event");
-    let value = activity.Response.Data.items.items.length;
+    let nextQueryDate = null;
+    if (response.body.records.length == limit) {
+      nextQueryDate = response.body.records[response.body.records.length - 1].StartDateTime;
+    }
+
+    while (nextQueryDate) {
+      let nextPageUrl = `/v26.0/query?q=SELECT Id,StartDateTime,CreatedDate,Subject,Description FROM event
+      WHERE StartDateTime > ${new Date(nextQueryDate).toISOString()} AND StartDateTime <= ${dateRange.endDate} ORDER BY StartDateTime ASC LIMIT ${limit}`;
+      const nextPage = await api(nextPageUrl);
+      if ($.isErrorResponse(activity, nextPage)) return;
+      allEvents.push(...nextPage.body.records);
+
+      nextQueryDate = null;
+      if (nextPage.body.records.length == limit) {
+        nextQueryDate = nextPage.body.records[nextPage.body.records.length - 1].StartDateTime;
+      }
+    }
+
+    let value = allEvents.length;
+    let pagination = $.pagination(activity);
+    let pagiantedItems = paginateItems(allEvents, pagination);
+
+    activity.Response.Data.items = api.mapObjectsToItems(pagiantedItems, "Event");
     activity.Response.Data.title = T(activity, 'Events Today');
     activity.Response.Data.link = `https://${api.getDomain()}/lightning/o/Event/home`;
     activity.Response.Data.linkLabel = T(activity, 'All events');
     activity.Response.Data.actionable = value > 0;
 
     if (value > 0) {
-      let nextEvent = getNexEvent(response.body.records);
+      let nextEvent = allEvents[0];
 
       let eventFormatedTime = getEventFormatedTimeAsString(activity, nextEvent);
       let eventPluralorNot = value > 1 ? T(activity, "events scheduled") : T(activity, "event scheduled");
@@ -35,28 +59,6 @@ module.exports = async (activity) => {
     $.handleError(activity, error);
   }
 };
-/**filters out first upcoming event in google calendar*/
-function getNexEvent(events) {
-  let nextEvent = null;
-  let nextEventMilis = 0;
-
-  for (let i = 0; i < events.length; i++) {
-    let tempDate = Date.parse(events[i].StartDateTime);
-
-    if (nextEventMilis == 0) {
-      nextEventMilis = tempDate;
-      nextEvent = events[i];
-    }
-
-    if (nextEventMilis > tempDate) {
-      nextEventMilis = tempDate;
-      nextEvent = events[i];
-    }
-  }
-
-  return nextEvent;
-}
-
 //** checks if event is in less then hour, today or tomorrow and returns formated string accordingly */
 function getEventFormatedTimeAsString(activity, nextEvent) {
   let eventTime = moment(nextEvent.StartDateTime)
@@ -69,7 +71,7 @@ function getEventFormatedTimeAsString(activity, nextEvent) {
   if (diffInHrs == 0) {
     //events that start in less then 1 hour
     let diffInMins = eventTime.diff(timeNow, 'minutes');
-    return T(activity,`in {0} minutes.`, diffInMins);
+    return T(activity, `in {0} minutes.`, diffInMins);
   } else {
     //events that start in more than 1 hour
     let diffInDays = eventTime.diff(timeNow, 'days');
@@ -85,6 +87,22 @@ function getEventFormatedTimeAsString(activity, nextEvent) {
       momentDate = eventTime.format('LL') + " ";
     }
 
-    return T(activity,`{0}{1}{2}{3}.`, T(activity,datePrefix), momentDate, T(activity,"at "), eventTime.format('LT'));
+    return T(activity, `{0}{1}{2}{3}.`, T(activity, datePrefix), momentDate, T(activity, "at "), eventTime.format('LT'));
   }
+}
+//** paginate items[] based on provided pagination */
+function paginateItems(items, pagination) {
+  let pagiantedItems = [];
+  const pageSize = parseInt(pagination.pageSize);
+  const offset = (parseInt(pagination.page) - 1) * pageSize;
+
+  if (offset > items.length) return pagiantedItems;
+
+  for (let i = offset; i < offset + pageSize; i++) {
+    if (i >= items.length) {
+      break;
+    }
+    pagiantedItems.push(items[i]);
+  }
+  return pagiantedItems;
 }
