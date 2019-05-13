@@ -8,14 +8,25 @@ module.exports = async function (activity) {
     if ($.isErrorResponse(activity, currentUser)) return;
 
     var dateRange = $.dateRange(activity, "today");
-    const response = await api.sendRequestWithPagination(`/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
+    let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
     FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} 
-    AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`);
-    if ($.isErrorResponse(activity, response)) return;
+    AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
+
+    let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM case WHERE CreatedDate > ${dateRange.startDate} 
+    AND CreatedDate < ${dateRange.endDate} AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
+    const promises = [];
+    promises.push(api.sendRequestWithPagination(url));
+    promises.push(api(valueUrl));
+    const responses = await Promise.all(promises);
+
+    for (let i = 0; i < responses.length; i++) {
+      if ($.isErrorResponse(activity, responses[i])) return;
+    }
+    const tickets = responses[0];
+    const value = responses[1].body.records[0].expr0;
 
     let salesforceDomain = api.getDomain();
-    activity.Response.Data.items = api.mapObjectsToItems(response.body.records, "Case");
-    let value = activity.Response.Data.items.items.length;
+    activity.Response.Data.items = api.mapObjectsToItems(tickets.body.records, "Case");
     activity.Response.Data.title = T(activity, 'Open Tickets');
     activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Case/list?filterName=Recent`;
     activity.Response.Data.linkLabel = T(activity, 'All Tickets');

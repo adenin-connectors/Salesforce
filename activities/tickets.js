@@ -5,13 +5,23 @@ module.exports = async function (activity) {
   try {
     api.initialize(activity);
     var dateRange = $.dateRange(activity, "today");
+    let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
+    FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND IsClosed = false`;
 
-    const response = await api.sendRequestWithPagination(`/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
-    FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND IsClosed = false`);
-    if ($.isErrorResponse(activity, response)) return;
+    let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM case WHERE CreatedDate > ${dateRange.startDate} 
+    AND CreatedDate < ${dateRange.endDate} AND IsClosed = false`;
+    const promises = [];
+    promises.push(api.sendRequestWithPagination(url));
+    promises.push(api(valueUrl));
+    const responses = await Promise.all(promises);
 
-    activity.Response.Data.items = api.mapObjectsToItems(response.body.records, "Case");
-    let value = activity.Response.Data.items.items.length;
+    for (let i = 0; i < responses.length; i++) {
+      if ($.isErrorResponse(activity, responses[i])) return;
+    }
+    const tickets = responses[0];
+    const value = responses[1].body.records[0].expr0;
+
+    activity.Response.Data.items = api.mapObjectsToItems(tickets.body.records, "Case");
     let salesforceDomain = api.getDomain();
     activity.Response.Data.title = T(activity, 'Open Tickets');
     activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Case/list`;
