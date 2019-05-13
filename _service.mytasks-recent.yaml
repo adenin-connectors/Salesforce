@@ -1,7 +1,7 @@
 InterfaceName: 'items'
-Description: 'My Tasks'
+Description: 'My Recent Tasks'
 APIDoc: ''
-Interfaces: 'pagination,status'
+Interfaces: 'daterange'
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

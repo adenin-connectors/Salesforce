@@ -7,13 +7,10 @@ module.exports = async function (activity) {
     const currentUser = await api('/v24.0/chatter/users/me');
     if ($.isErrorResponse(activity, currentUser)) return;
 
-    var dateRange = $.dateRange(activity, "today");
     let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
-    FROM task WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate}
-    AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
-
-    let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM task WHERE CreatedDate > ${dateRange.startDate} 
-    AND CreatedDate < ${dateRange.endDate} AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
+    FROM task WHERE OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
+    let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM task WHERE OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
+    
     const promises = [];
     promises.push(api.sendRequestWithPagination(url));
     promises.push(api(valueUrl));
