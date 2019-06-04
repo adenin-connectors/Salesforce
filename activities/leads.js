@@ -5,15 +5,9 @@ module.exports = async function (activity) {
   try {
     api.initialize(activity);
     let salesforceDomain = api.getDomain();
-
-    let currentUserData = await api("/v24.0/chatter/users/me");
-    if ($.isErrorResponse(activity, currentUserData)) return;
-
     var dateRange = $.dateRange(activity, "today");
-    let url = `/v40.0/query?q=SELECT Id,FirstName,LastName FROM lead ` +
-      `WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} and OwnerId = '${currentUserData.body.id}'`;
-    let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM lead ` +
-      `WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} and OwnerId = '${currentUserData.body.id}'`;
+    let url = `/v40.0/query?q=SELECT Id,FirstName,LastName FROM lead WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate}`;
+    let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM lead WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate}`;
 
     const promises = [];
     promises.push(api.sendRequestWithPagination(url));
@@ -36,8 +30,8 @@ module.exports = async function (activity) {
 
     if (value > 0) {
       activity.Response.Data.color = 'blue';
-      activity.Response.Data.description = value > 1 ? T(activity, "You have {0} leads.", value)
-        : T(activity, "You have 1 lead.");
+      activity.Response.Data.description = value > 1 ? T(activity, "You have {0} leads.", value) 
+      : T(activity, "You have 1 lead.");
     } else {
       activity.Response.Data.description = T(activity, `You have no leads.`);
     }

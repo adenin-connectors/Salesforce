@@ -98,7 +98,7 @@ api.mapObjectsToItems = function (responseDataArr, itemName) {
       id: raw.Id,
       title: raw.Subject,
       description: raw.Description,
-      date : new Date(raw.CreatedDate).toISOString(),
+      date: new Date(raw.CreatedDate).toISOString(),
       link: `https://${salesforceDomain}/lightning/r/${itemName}/${raw.Id}/view`,
       raw: raw
     };

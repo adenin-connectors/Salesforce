@@ -1,7 +1,7 @@
 InterfaceName: 'status'
-Description: 'My New Leads'
+Description: 'All Leads'
 APIDoc: ''
-Interfaces: 'daterange'
+Interfaces: 'items,daterange,pagination'
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''
