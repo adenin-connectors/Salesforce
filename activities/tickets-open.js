@@ -6,10 +6,10 @@ module.exports = async function (activity) {
     api.initialize(activity);
     var dateRange = $.dateRange(activity, "today");
     let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
-    FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate}`;
+    FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND IsClosed = false`;
 
     let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM case WHERE CreatedDate > ${dateRange.startDate} 
-    AND CreatedDate < ${dateRange.endDate}`;
+    AND CreatedDate < ${dateRange.endDate} AND IsClosed = false`;
     const promises = [];
     promises.push(api.sendRequestWithPagination(url));
     promises.push(api(valueUrl));
