@@ -1,7 +1,7 @@
-InterfaceName: 'items'
+InterfaceName: 'status'
 Description: 'All Tasks'
 APIDoc: ''
-Interfaces: 'pagination,daterange,status'
+Interfaces: 'items,daterange,pagination'
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''
