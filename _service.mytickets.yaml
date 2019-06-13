@@ -1,8 +1,7 @@
-ServiceName: 'mytickets'
-InterfaceName: 'items'
+InterfaceName: 'status'
 Description: 'My Tickets'
 APIDoc: ''
-Interfaces: 'search,pagination'
+Interfaces: 'items,pagination,daterange'
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

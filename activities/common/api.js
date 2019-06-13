@@ -86,7 +86,7 @@ api.sendRequestWithPagination = function (url) {
 };
 
 //**maps response to items */
-api.mapTicketsAndTasksToItems = function (responseDataArr, itemName) {
+api.mapObjectsToItems = function (responseDataArr, itemName) {
   let items = [];
 
   let salesforceDomain = api.getDomain();
@@ -98,13 +98,14 @@ api.mapTicketsAndTasksToItems = function (responseDataArr, itemName) {
       id: raw.Id,
       title: raw.Subject,
       description: raw.Description,
+      date: new Date(raw.CreatedDate).toISOString(),
       link: `https://${salesforceDomain}/lightning/r/${itemName}/${raw.Id}/view`,
       raw: raw
     };
     items.push(item);
   }
 
-  return { items: items };
+  return { items };
 };
 
 //**maps response to items */

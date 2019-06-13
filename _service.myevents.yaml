@@ -1,7 +1,7 @@
 InterfaceName: 'status'
-Description: 'My Leads'
+Description: 'My Event Status'
 APIDoc: ''
-Interfaces: 'items,daterange,pagination'
+Interfaces: 'daterange,pagination,status'
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

@@ -1,5 +1,5 @@
 InterfaceName: 'status'
-Description: 'My Leads'
+Description: 'All Tasks'
 APIDoc: ''
 Interfaces: 'items,daterange,pagination'
 RequiredScopes: ''

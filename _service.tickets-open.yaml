@@ -1,8 +1,7 @@
-ServiceName: 'myevent-status'
 InterfaceName: 'status'
-Description: 'My Event Status'
+Description: 'Open Tickets'
 APIDoc: ''
-Interfaces: ''
+Interfaces: 'items,pagination,daterange'
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

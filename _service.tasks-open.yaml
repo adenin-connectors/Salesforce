@@ -1,8 +1,7 @@
-ServiceName: 'mytasks-new'
 InterfaceName: 'status'
-Description: 'My New Tasks'
+Description: 'Open Tasks'
 APIDoc: ''
-Interfaces: 'daterange'
+Interfaces: 'items,daterange,pagination'
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

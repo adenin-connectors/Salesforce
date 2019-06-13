@@ -1,8 +1,7 @@
-ServiceName: 'myticket-create'
 InterfaceName: 'create'
 Description: 'Create New Ticket'
 APIDoc: ''
-Interfaces: 'search,pagination'
+Interfaces: ''
 RequiredScopes: ''
 AdditionalParameters:
 Method: ''

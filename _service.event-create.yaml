@@ -1,4 +1,3 @@
-ServiceName: 'event-create'
 InterfaceName: 'create'
 Description: 'Create Salesforce Event'
 APIDoc: ''

@@ -1,8 +1,0 @@
-ServiceName: 'myleads-search'
-InterfaceName: 'items'
-Description: 'Search Leads'
-APIDoc: ''
-Interfaces: 'search'
-RequiredScopes: ''
-AdditionalParameters:
-Method: ''
