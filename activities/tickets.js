@@ -6,7 +6,7 @@ module.exports = async function (activity) {
     api.initialize(activity);
     var dateRange = $.dateRange(activity, "today");
     let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
-    FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate}`;
+    FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} ORDER BY CreatedDate DESC`;
 
     let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM case WHERE CreatedDate > ${dateRange.startDate} 
     AND CreatedDate < ${dateRange.endDate}`;
@@ -30,6 +30,7 @@ module.exports = async function (activity) {
 
     if (value > 0) {
       activity.Response.Data.value = value;
+      activity.Response.Data.date = activity.Response.Data.items[0].date;
       activity.Response.Data.color = 'blue';
       activity.Response.Data.description = value > 1 ? T(activity, "You have {0} tickets.", value)
         : T(activity, "You have 1 ticket.");

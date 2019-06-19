@@ -36,6 +36,7 @@ module.exports = async (activity) => {
       let description = T(activity, `You have {0} {1} today. The next event '{2}' starts {3}`, value, eventPluralorNot, nextEvent.Subject, eventFormatedTime);
 
       activity.Response.Data.value = value;
+      activity.Response.Data.date = activity.Response.Data.items[0].date;
       activity.Response.Data.color = 'blue';
       activity.Response.Data.description = description;
     } else {

@@ -10,7 +10,7 @@ module.exports = async function (activity) {
     
     let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
     FROM task WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND 
-    IsClosed = false AND OwnerId = '${currentUser.body.id}'`;
+    IsClosed = false AND OwnerId = '${currentUser.body.id}' ORDER BY CreatedDate DESC`;
 
     let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM task 
     WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND 
@@ -36,6 +36,7 @@ module.exports = async function (activity) {
 
     if (value > 0) {
       activity.Response.Data.value = value;
+      activity.Response.Data.date = activity.Response.Data.items[0].date;
       activity.Response.Data.color = 'blue';
       activity.Response.Data.description = value > 1 ? T(activity, "You have {0} tasks.", value)
         : T(activity, "You have 1 task.");
