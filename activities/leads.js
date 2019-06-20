@@ -4,7 +4,6 @@ const api = require('./common/api');
 module.exports = async function (activity) {
   try {
     api.initialize(activity);
-    let salesforceDomain = api.getDomain();
     var dateRange = $.dateRange(activity, "today");
     let url = `/v40.0/query?q=SELECT Id,FirstName,LastName,CreatedDate FROM lead ` +
       `WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} ORDER BY CreatedDate DESC`;
@@ -22,20 +21,25 @@ module.exports = async function (activity) {
     const leads = responses[0].body.records;
     const value = responses[1].body.records[0].expr0;
 
+    const pagination = $.pagination(activity);
     activity.Response.Data.items = api.mapLeadsToItems(leads);
-    activity.Response.Data.title = T(activity, 'Active Leads');
-    activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Lead/list`;
-    activity.Response.Data.linkLabel = T(activity, 'All Leads');
-    activity.Response.Data.actionable = value > 0;
 
-    if (value > 0) {
-      activity.Response.Data.value = value;
-      activity.Response.Data.date = activity.Response.Data.items[0].date;
-      activity.Response.Data.color = 'blue';
-      activity.Response.Data.description = value > 1 ? T(activity, "You have {0} leads.", value)
-        : T(activity, "You have 1 lead.");
-    } else {
-      activity.Response.Data.description = T(activity, `You have no leads.`);
+    if (parseInt(pagination.page) == 1) {
+      let salesforceDomain = api.getDomain();
+      activity.Response.Data.title = T(activity, 'Active Leads');
+      activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Lead/list`;
+      activity.Response.Data.linkLabel = T(activity, 'All Leads');
+      activity.Response.Data.actionable = value > 0;
+
+      if (value > 0) {
+        activity.Response.Data.value = value;
+        activity.Response.Data.date = activity.Response.Data.items[0].date;
+        activity.Response.Data.color = 'blue';
+        activity.Response.Data.description = value > 1 ? T(activity, "You have {0} leads.", value)
+          : T(activity, "You have 1 lead.");
+      } else {
+        activity.Response.Data.description = T(activity, `You have no leads.`);
+      }
     }
   } catch (error) {
     $.handleError(activity, error);

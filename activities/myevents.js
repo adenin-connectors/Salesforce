@@ -9,38 +9,42 @@ module.exports = async (activity) => {
     var dateRange = $.dateRange(activity, "today");
     let url = `/v26.0/query?q=SELECT Id,StartDateTime,CreatedDate,Subject,Description FROM event
     WHERE StartDateTime > ${new Date(new Date().toUTCString()).toISOString()} AND StartDateTime <= ${dateRange.endDate} ORDER BY StartDateTime ASC`;
-    
+
     let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM event WHERE StartDateTime > ${new Date(new Date().toUTCString()).toISOString()} 
     AND StartDateTime <= ${dateRange.endDate}`;
     const promises = [];
     promises.push(api.sendRequestWithPagination(url));
     promises.push(api(valueUrl));
     const responses = await Promise.all(promises);
-  
+
     for (let i = 0; i < responses.length; i++) {
       if ($.isErrorResponse(activity, responses[i])) return;
     }
     const events = responses[0];
     const value = responses[1].body.records[0].expr0;
 
+    const pagination = $.pagination(activity);
     activity.Response.Data.items = api.mapObjectsToItems(events.body.records, "Event");
-    activity.Response.Data.title = T(activity, 'Events Today');
-    activity.Response.Data.link = `https://${api.getDomain()}/lightning/o/Event/home`;
-    activity.Response.Data.linkLabel = T(activity, 'All events');
-    activity.Response.Data.actionable = value > 0;
 
-    let nextEvent = events.body.records[0];
-    if (value > 0 && nextEvent) {
-      let eventFormatedTime = getEventFormatedTimeAsString(activity, nextEvent);
-      let eventPluralorNot = value > 1 ? T(activity, "events scheduled") : T(activity, "event scheduled");
-      let description = T(activity, `You have {0} {1} today. The next event '{2}' starts {3}`, value, eventPluralorNot, nextEvent.Subject, eventFormatedTime);
+    if (parseInt(pagination.page) == 1) {
+      activity.Response.Data.title = T(activity, 'Events Today');
+      activity.Response.Data.link = `https://${api.getDomain()}/lightning/o/Event/home`;
+      activity.Response.Data.linkLabel = T(activity, 'All events');
+      activity.Response.Data.actionable = value > 0;
 
-      activity.Response.Data.value = value;
-      activity.Response.Data.date = activity.Response.Data.items[0].date;
-      activity.Response.Data.color = 'blue';
-      activity.Response.Data.description = description;
-    } else {
-      activity.Response.Data.description = T(activity, `You have no events today.`);
+      let nextEvent = events.body.records[0];
+      if (value > 0 && nextEvent) {
+        let eventFormatedTime = getEventFormatedTimeAsString(activity, nextEvent);
+        let eventPluralorNot = value > 1 ? T(activity, "events scheduled") : T(activity, "event scheduled");
+        let description = T(activity, `You have {0} {1} today. The next event '{2}' starts {3}`, value, eventPluralorNot, nextEvent.Subject, eventFormatedTime);
+
+        activity.Response.Data.value = value;
+        activity.Response.Data.date = activity.Response.Data.items[0].date;
+        activity.Response.Data.color = 'blue';
+        activity.Response.Data.description = description;
+      } else {
+        activity.Response.Data.description = T(activity, `You have no events today.`);
+      }
     }
   } catch (error) {
     $.handleError(activity, error);
