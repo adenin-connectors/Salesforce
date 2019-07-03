@@ -10,7 +10,7 @@ module.exports = async function (activity) {
     var dateRange = $.dateRange(activity, "today");
     let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
     FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} 
-    AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
+    AND OwnerId = '${currentUser.body.id}' AND IsClosed = false ORDER BY CreatedDate DESC`;
 
     let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM case WHERE CreatedDate > ${dateRange.startDate} 
     AND CreatedDate < ${dateRange.endDate} AND OwnerId = '${currentUser.body.id}' AND IsClosed = false`;
@@ -25,20 +25,25 @@ module.exports = async function (activity) {
     const tickets = responses[0];
     const value = responses[1].body.records[0].expr0;
 
-    let salesforceDomain = api.getDomain();
+    const pagination = $.pagination(activity);
     activity.Response.Data.items = api.mapObjectsToItems(tickets.body.records, "Case");
-    activity.Response.Data.title = T(activity, 'Open Tickets');
-    activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Case/list?filterName=Recent`;
-    activity.Response.Data.linkLabel = T(activity, 'All Tickets');
-    activity.Response.Data.actionable = value > 0;
 
-    if (value > 0) {
-      activity.Response.Data.value = value;
-      activity.Response.Data.color = 'blue';
-      activity.Response.Data.description = value > 1 ? T(activity, "You have {0} tickets.", value)
-        : T(activity, "You have 1 ticket.");
-    } else {
-      activity.Response.Data.description = T(activity, `You have no tickets.`);
+    if (parseInt(pagination.page) == 1) {
+      let salesforceDomain = api.getDomain();
+      activity.Response.Data.title = T(activity, 'Open Tickets');
+      activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Case/list?filterName=Recent`;
+      activity.Response.Data.linkLabel = T(activity, 'All Tickets');
+      activity.Response.Data.actionable = value > 0;
+
+      if (value > 0) {
+        activity.Response.Data.value = value;
+        activity.Response.Data.date = activity.Response.Data.items[0].date;
+        activity.Response.Data.color = 'blue';
+        activity.Response.Data.description = value > 1 ? T(activity, "You have {0} tickets.", value)
+          : T(activity, "You have 1 ticket.");
+      } else {
+        activity.Response.Data.description = T(activity, `You have no tickets.`);
+      }
     }
   } catch (error) {
     $.handleError(activity, error);

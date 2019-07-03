@@ -51,7 +51,7 @@ api.initialize = (activity) => {
   _activity = activity;
 };
 
-api.stream = (url, opts) => got(url, Object.assign({}, opts, {
+api.stream = (url, opts) => api(url, Object.assign({}, opts, {
   json: false,
   stream: true
 }));
@@ -105,7 +105,7 @@ api.mapObjectsToItems = function (responseDataArr, itemName) {
     items.push(item);
   }
 
-  return { items };
+  return items;
 };
 
 //**maps response to items */
@@ -121,13 +121,14 @@ api.mapLeadsToItems = function (responseDataArr) {
       id: raw.Id,
       title: raw.FirstName,
       description: raw.LastName,
+      date: new Date(raw.CreatedDate).toISOString(),
       link: `https://${salesforceDomain}/lightning/r/Lead/${raw.Id}/view`,
       raw: raw
     };
     items.push(item);
   }
 
-  return { items: items };
+  return items;
 };
 
 module.exports = api;
