@@ -4,7 +4,7 @@ const api = require('./common/api');
 module.exports = async function (activity) {
   try {
     api.initialize(activity);
-    var dateRange = $.dateRange(activity, "today");
+    var dateRange = $.dateRange(activity);
     let url = `/v40.0/query?q=SELECT Id,FirstName,LastName,CreatedDate FROM lead ` +
       `WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} ORDER BY CreatedDate DESC`;
     let valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM lead WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate}`;

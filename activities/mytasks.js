@@ -6,7 +6,7 @@ module.exports = async function (activity) {
     api.initialize(activity);
     const currentUser = await api('/v24.0/chatter/users/me');
     if ($.isErrorResponse(activity, currentUser)) return;
-    var dateRange = $.dateRange(activity, "today");
+    var dateRange = $.dateRange(activity);
 
     let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
     FROM task WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND 

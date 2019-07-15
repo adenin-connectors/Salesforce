@@ -7,7 +7,7 @@ module.exports = async function (activity) {
     const currentUser = await api('/v24.0/chatter/users/me');
     if ($.isErrorResponse(activity, currentUser)) return;
 
-    var dateRange = $.dateRange(activity, "today");
+    var dateRange = $.dateRange(activity);
     let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed 
     FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} 
     AND OwnerId = '${currentUser.body.id}' AND IsClosed = false ORDER BY CreatedDate DESC`;
