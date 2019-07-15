@@ -8,7 +8,7 @@ module.exports = async function (activity) {
     let currentUserData = await api("/v24.0/chatter/users/me");
     if ($.isErrorResponse(activity, currentUserData)) return;
 
-    var dateRange = $.dateRange(activity, "today");
+    var dateRange = $.dateRange(activity);
     let url = `/v40.0/query?q=SELECT Id,FirstName,LastName,CreatedDate FROM lead ` +
       `WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} and ` +
       `OwnerId = '${currentUserData.body.id}' ORDER BY CreatedDate DESC`;

@@ -4,7 +4,7 @@ const api = require('./common/api');
 module.exports = async function (activity) {
   try {
     api.initialize(activity);
-    var dateRange = $.dateRange(activity, "today");
+    var dateRange = $.dateRange(activity);
     let url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed ` +
       `FROM task WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} ` +
       `AND IsClosed = false ORDER BY CreatedDate DESC`;
