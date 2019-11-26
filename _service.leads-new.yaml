@@ -1,4 +1,4 @@
-ServiceName: 'tickets-open'
+ServiceName: 'leads-new'
 InterfaceName: 'status'
-Description: 'Open Tickets'
+Description: 'New Leads'
 Interfaces: 'items,daterange,pagination'

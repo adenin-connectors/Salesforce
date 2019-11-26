@@ -8,8 +8,14 @@ module.exports = async function (activity) {
 
     const dateRange = $.dateRange(activity);
 
-    const url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND IsClosed = false ORDER BY CreatedDate DESC`;
-    const valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} AND IsClosed = false`;
+    const url = `/v26.0/query?q=SELECT Id,Subject,Description,OwnerId,CreatedDate,IsClosed FROM case WHERE CreatedDate > ${dateRange.startDate} AND CreatedDate < ${dateRange.endDate} ORDER BY CreatedDate DESC`;
+
+    // for new activity we use readDate to fetch value
+    let readDate = (new Date(new Date().setDate(new Date().getDate() - 30))).toISOString(); // default read date 30 days in the past
+
+    if (activity.Request.Query.readDate) readDate = activity.Request.Query.readDate;
+
+    const valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM case WHERE CreatedDate > ${readDate}`;
 
     const promises = [];
 
@@ -32,7 +38,7 @@ module.exports = async function (activity) {
     if (parseInt(pagination.page) === 1) {
       const salesforceDomain = api.getDomain();
 
-      activity.Response.Data.title = T(activity, 'Open Tickets');
+      activity.Response.Data.title = T(activity, 'New Tickets');
       activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Case/list`;
       activity.Response.Data.linkLabel = T(activity, 'All Tickets');
       activity.Response.Data.actionable = value > 0;
@@ -41,9 +47,9 @@ module.exports = async function (activity) {
       if (value > 0) {
         activity.Response.Data.value = value;
         activity.Response.Data.date = activity.Response.Data.items[0].date;
-        activity.Response.Data.description = value > 1 ? T(activity, 'You have {0} open tickets.', value) : T(activity, 'You have 1 open ticket.');
+        activity.Response.Data.description = value > 1 ? T(activity, 'You have {0} new tickets.', value) : T(activity, 'You have 1 new ticket.');
       } else {
-        activity.Response.Data.description = T(activity, 'You have no open tickets.');
+        activity.Response.Data.description = T(activity, 'You have no new tickets.');
       }
     }
   } catch (error) {
