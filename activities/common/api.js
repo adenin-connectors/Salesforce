@@ -1,4 +1,5 @@
 'use strict';
+
 const got = require('got');
 const HttpAgent = require('agentkeepalive');
 const HttpsAgent = HttpAgent.HttpsAgent;
@@ -59,12 +60,12 @@ api.stream = (url, opts) => api(url, Object.assign({}, opts, {
 //** returns Salesforce domain in correct format */
 api.getDomain = function () {
   let domain = _activity.Context.connector.custom1;
+
   domain = domain.replace('https://', '');
   domain = domain.replace('/', '');
 
-  if (!domain.includes('.salesforce.com')) {
-    domain += '.salesforce.com';
-  }
+  if (!domain.includes('.salesforce.com')) domain += '.salesforce.com';
+
   return domain;
 };
 
@@ -77,8 +78,8 @@ for (const x of helpers) {
 //**sends request to provided url and pagination using limit and offset*/
 api.sendRequestWithPagination = function (url) {
   const pagination = $.pagination(_activity);
-  const pageSize = parseInt(pagination.pageSize, 10);
-  const offset = (parseInt(pagination.page, 10) - 1) * pageSize;
+  const pageSize = parseInt(pagination.pageSize);
+  const offset = (parseInt(pagination.page) - 1) * pageSize;
 
   url += `+LIMIT+${pageSize}+OFFSET+${offset}`;
 
@@ -86,22 +87,29 @@ api.sendRequestWithPagination = function (url) {
 };
 
 //**maps response to items */
-api.mapObjectsToItems = function (responseDataArr, itemName) {
-  let items = [];
-
-  let salesforceDomain = api.getDomain();
+api.mapObjectsToItems = function (responseDataArr, itemName, includeStatus) {
+  const items = [];
+  const salesforceDomain = api.getDomain();
 
   for (let i = 0; i < responseDataArr.length; i++) {
-    let raw = responseDataArr[i];
+    const raw = responseDataArr[i];
 
-    let item = {
+    let description = '';
+
+    if (raw.SuppliedName) description += raw.SuppliedName;
+    if (raw.SuppliedCompany) description += description ? ` from ${raw.SuppliedCompany}` : raw.SuppliedCompany;
+    if (!description && raw.Reason) description += raw.Reason;
+    if (includeStatus && raw.Status) description += description ? ` - ${raw.Status}` : raw.Status;
+
+    const item = {
       id: raw.Id,
       title: raw.Subject,
-      description: raw.Description,
+      description: description,
       date: new Date(raw.CreatedDate).toISOString(),
       link: `https://${salesforceDomain}/lightning/r/${itemName}/${raw.Id}/view`,
       raw: raw
     };
+
     items.push(item);
   }
 
@@ -110,21 +118,21 @@ api.mapObjectsToItems = function (responseDataArr, itemName) {
 
 //**maps response to items */
 api.mapLeadsToItems = function (responseDataArr) {
-  let items = [];
-
-  let salesforceDomain = api.getDomain();
+  const items = [];
+  const salesforceDomain = api.getDomain();
 
   for (let i = 0; i < responseDataArr.length; i++) {
-    let raw = responseDataArr[i];
+    const raw = responseDataArr[i];
 
-    let item = {
+    const item = {
       id: raw.Id,
-      title: raw.FirstName,
-      description: raw.LastName,
+      title: `${raw.FirstName} ${raw.LastName}`,
+      description: raw.Company,
       date: new Date(raw.CreatedDate).toISOString(),
       link: `https://${salesforceDomain}/lightning/r/Lead/${raw.Id}/view`,
       raw: raw
     };
+
     items.push(item);
   }
 

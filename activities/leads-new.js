@@ -37,18 +37,28 @@ module.exports = async function (activity) {
     if (parseInt(pagination.page) === 1) {
       const salesforceDomain = api.getDomain();
 
-      activity.Response.Data.title = T(activity, 'Open Leads');
+      activity.Response.Data.title = T(activity, 'New Leads');
       activity.Response.Data.link = `https://${salesforceDomain}/lightning/o/Lead/list`;
       activity.Response.Data.linkLabel = T(activity, 'All Leads');
       activity.Response.Data.actionable = value > 0;
       activity.Response.Data.thumbnail = 'https://www.adenin.com/assets/images/wp-images/logo/salesforce.svg';
 
       if (value > 0) {
+        const first = activity.Response.Data.items[0];
+
         activity.Response.Data.value = value;
-        activity.Response.Data.date = activity.Response.Data.items[0].date;
-        activity.Response.Data.description = value > 1 ? T(activity, 'You have {0} open leads.', value) : T(activity, 'You have 1 open lead.');
+        activity.Response.Data.date = first.date;
+        activity.Response.Data.description = value > 1 ? T(activity, 'You have {0} new leads.', value) : T(activity, 'You have 1 new lead.');
+
+        if (first.raw.Company) {
+          activity.Response.Data.briefing = `You have a new lead from <b>${first.raw.Company}</b>`;
+
+          if (value > 1) activity.Response.Data.briefing += value > 2 ? ` and ${value - 1} more new leads` : ' and 1 more new lead';
+        } else {
+          activity.Response.Data.briefing = activity.Response.Data.description + ` The latest is <b>${first.title}</b>`;
+        }
       } else {
-        activity.Response.Data.description = T(activity, 'You have no open leads.');
+        activity.Response.Data.description = T(activity, 'You have no new leads.');
       }
     }
   } catch (error) {
