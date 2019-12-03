@@ -8,7 +8,7 @@ module.exports = async (activity) => {
 
     const dateRange = $.dateRange(activity, 'today');
 
-    const url = `/v40.0/query?q=SELECT Id,StartDateTime,CreatedDate,Subject,Description,Location,OwnerId,DurationInMinutes,UndecidedEventInviteeIds,AcceptedEventInviteeIds,DeclinedEventInviteeIds FROM event WHERE StartDateTime > ${new Date(new Date().toUTCString()).toISOString()} AND StartDateTime <= ${dateRange.endDate} ORDER BY StartDateTime ASC`;
+    const url = `/v40.0/query?q=SELECT Id,StartDateTime,EndDateTime,CreatedDate,Subject,Description,Location,OwnerId,DurationInMinutes,UndecidedEventInviteeIds,AcceptedEventInviteeIds,DeclinedEventInviteeIds FROM event WHERE StartDateTime > ${new Date(new Date().toUTCString()).toISOString()} AND StartDateTime <= ${dateRange.endDate} ORDER BY StartDateTime ASC`;
     const valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM event WHERE StartDateTime > ${new Date(new Date().toUTCString()).toISOString()} AND StartDateTime <= ${dateRange.endDate}`;
 
     const promises = [];
@@ -37,11 +37,22 @@ module.exports = async (activity) => {
         title: raw.Subject,
         description: raw.Description,
         link: `https://${api.getDomain()}/lightning/r/Event/${raw.Id}/view`,
-        date: new Date(raw.StartDateTime),
-        duration: raw.DurationInMinutes,
-        location: raw.Location,
-        raw: raw
+        date: new Date(raw.StartDateTime)
       };
+
+      item.duration = moment.duration(moment(raw.EndDateTime).diff(moment(raw.StartDateTime))).humanize();
+
+      const meetingUrl = parseUrl(raw.Location);
+
+      if (meetingUrl) {
+        item.onlineMeetingUrl = meetingUrl;
+      } else {
+        item.location = {
+          title: raw.Location
+        };
+      }
+
+      item.raw = raw;
 
       items.push(item);
     }
@@ -52,19 +63,19 @@ module.exports = async (activity) => {
       activity.Response.Data.title = T(activity, 'Events Today');
       activity.Response.Data.link = `https://${api.getDomain()}/lightning/o/Event/home`;
       activity.Response.Data.linkLabel = T(activity, 'All events');
+      activity.Response.Data.thumbnail = 'https://www.adenin.com/assets/images/wp-images/logo/salesforce.svg';
       activity.Response.Data.actionable = value > 0;
 
-      const first = items[0];
-
-      if (value > 0 && first) {
-        const eventFormatedTime = getEventFormatedTimeAsString(activity, first);
-        const eventPluralorNot = value > 1 ? T(activity, 'events scheduled') : T(activity, 'event scheduled');
-        const description = T(activity, 'You have {0} {1} today. The next event \'{2}\' starts {3}', value, eventPluralorNot, first.Subject, eventFormatedTime);
+      if (value > 0) {
+        const first = items[0];
 
         activity.Response.Data.value = value;
         activity.Response.Data.date = first.date;
-        activity.Response.Data.description = description;
-        activity.Response.Data.briefing = description;
+        activity.Response.Data.description = value > 1 ? `You have ${value} events today.` : 'You have 1 event today';
+
+        const when = moment().to(moment(first.date));
+
+        activity.Response.Data.briefing = activity.Response.Data.description + ` The next is '${first.title}' ${when}`;
       } else {
         activity.Response.Data.description = T(activity, 'You have no events today.');
       }
@@ -74,33 +85,19 @@ module.exports = async (activity) => {
   }
 };
 
-//** checks if event is in less then hour, today or tomorrow and returns formated string accordingly */
-function getEventFormatedTimeAsString(activity, nextEvent) {
-  const eventTime = moment(nextEvent.StartDateTime).tz(activity.Context.UserTimezone);
-  const timeNow = moment(new Date());
+const urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
 
-  const diffInHrs = eventTime.diff(timeNow, 'hours');
+function parseUrl(text) {
+  text = text.replace(/\n|\r/g, ' ');
 
-  if (diffInHrs === 0) {
-    //events that start in less then 1 hour
-    const diffInMins = eventTime.diff(timeNow, 'minutes');
-    return T(activity, 'in {0} minutes.', diffInMins);
-  } else {
-    //events that start in more than 1 hour
-    const diffInDays = eventTime.diff(timeNow, 'days');
+  if (text.search(urlRegex) !== -1) {
+    let url = text.substring(text.search(urlRegex), text.length);
 
-    let datePrefix = '';
-    let momentDate = '';
+    if (url.indexOf(' ') !== -1) url = url.substring(0, url.indexOf(' '));
+    if (!url.match(/^[a-zA-Z]+:\/\//)) url = 'https://' + url;
 
-    if (diffInDays === 1) {
-      //events that start tomorrow
-      datePrefix = 'tomorrow ';
-    } else if (diffInDays > 1) {
-      //events that start day after tomorrow and later
-      datePrefix = 'on ';
-      momentDate = eventTime.format('LL') + ' ';
-    }
-
-    return T(activity, '{0}{1}{2}{3}.', T(activity, datePrefix), momentDate, T(activity, 'at '), eventTime.format('LT'));
+    return url;
   }
+
+  return null;
 }
