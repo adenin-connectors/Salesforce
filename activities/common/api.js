@@ -71,8 +71,8 @@ api.getDomain = function () {
 
 for (const x of helpers) {
   const method = x.toUpperCase();
-  api[x] = (url, opts) => api(url, Object.assign({}, opts, { method }));
-  api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, { method }));
+  api[x] = (url, opts) => api(url, Object.assign({}, opts, {method}));
+  api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, {method}));
 }
 
 //**sends request to provided url and pagination using limit and offset*/
