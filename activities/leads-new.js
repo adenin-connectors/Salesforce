@@ -15,7 +15,6 @@ module.exports = async function (activity) {
     if (activity.Request.Query.readDate) readDate = activity.Request.Query.readDate;
 
     const valueUrl = `/v40.0/query?q=SELECT COUNT(Id) FROM lead WHERE CreatedDate > ${readDate}`;
-
     const promises = [];
 
     promises.push(api.sendRequestWithPagination(url));
@@ -30,9 +29,13 @@ module.exports = async function (activity) {
     const leads = responses[0].body.records;
     const value = responses[1].body.records[0].expr0;
 
+    for (let i = 0; i < value && i < leads.length; i++) {
+      leads[i].isNew = true;
+    }
+
     const pagination = $.pagination(activity);
 
-    activity.Response.Data.items = api.mapLeadsToItems(leads);
+    activity.Response.Data.items = api.mapLeadsToItems(leads, true);
 
     if (parseInt(pagination.page) === 1) {
       const salesforceDomain = api.getDomain();

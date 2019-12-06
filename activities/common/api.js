@@ -94,21 +94,26 @@ api.mapObjectsToItems = function (responseDataArr, itemName, includeStatus) {
   for (let i = 0; i < responseDataArr.length; i++) {
     const raw = responseDataArr[i];
 
-    let description = '';
-
-    if (raw.SuppliedName) description += raw.SuppliedName;
-    if (raw.SuppliedCompany) description += description ? ` from ${raw.SuppliedCompany}` : raw.SuppliedCompany;
-    if (!description && raw.Reason) description += raw.Reason;
-    if (includeStatus && raw.Status) description += description ? ` - ${raw.Status}` : raw.Status;
-
     const item = {
       id: raw.Id,
       title: raw.Subject,
-      description: description,
       date: new Date(raw.CreatedDate).toISOString(),
       link: `https://${salesforceDomain}/lightning/r/${itemName}/${raw.Id}/view`,
       raw: raw
     };
+
+    item.description = '';
+
+    if (raw.SuppliedName) {
+      item.description += raw.SuppliedName;
+      item.thumbnail = $.avatarLink(raw.SuppliedName, raw.SuppliedEmail);
+      item.imageIsAvatar = true;
+    }
+
+    if (raw.SuppliedCompany) item.description += item.description ? ` from ${raw.SuppliedCompany}` : raw.SuppliedCompany;
+    if (!item.description && raw.Reason) item.description += raw.Reason;
+
+    if (includeStatus && raw.Status) item.statusText = raw.Status;
 
     items.push(item);
   }
@@ -117,7 +122,7 @@ api.mapObjectsToItems = function (responseDataArr, itemName, includeStatus) {
 };
 
 //**maps response to items */
-api.mapLeadsToItems = function (responseDataArr) {
+api.mapLeadsToItems = function (responseDataArr, includeStatus) {
   const items = [];
   const salesforceDomain = api.getDomain();
 
@@ -132,6 +137,11 @@ api.mapLeadsToItems = function (responseDataArr) {
       link: `https://${salesforceDomain}/lightning/r/Lead/${raw.Id}/view`,
       raw: raw
     };
+
+    item.thumbnail = $.avatarLink(item.title, raw.Email);
+    item.imageIsAvatar = true;
+
+    if (includeStatus && raw.Status) item.statusText = raw.Status;
 
     items.push(item);
   }

@@ -31,6 +31,10 @@ module.exports = async function (activity) {
     const tickets = responses[0];
     const value = responses[1].body.records[0].expr0;
 
+    for (let i = 0; i < tickets.length && i < value; i++) {
+      tickets[i].isNew = true;
+    }
+
     const pagination = $.pagination(activity);
 
     activity.Response.Data.items = api.mapObjectsToItems(tickets.body.records, 'Case', true);
