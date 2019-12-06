@@ -98,8 +98,7 @@ api.mapObjectsToItems = function (responseDataArr, itemName, includeStatus) {
       id: raw.Id,
       title: raw.Subject,
       date: new Date(raw.CreatedDate).toISOString(),
-      link: `https://${salesforceDomain}/lightning/r/${itemName}/${raw.Id}/view`,
-      raw: raw
+      link: `https://${salesforceDomain}/lightning/r/${itemName}/${raw.Id}/view`
     };
 
     item.description = '';
@@ -114,6 +113,8 @@ api.mapObjectsToItems = function (responseDataArr, itemName, includeStatus) {
     if (!item.description && raw.Reason) item.description += raw.Reason;
 
     if (includeStatus && raw.Status) item.statusText = raw.Status;
+
+    item.raw = raw;
 
     items.push(item);
   }
@@ -134,14 +135,15 @@ api.mapLeadsToItems = function (responseDataArr, includeStatus) {
       title: `${raw.FirstName} ${raw.LastName}`,
       description: raw.Company,
       date: new Date(raw.CreatedDate).toISOString(),
-      link: `https://${salesforceDomain}/lightning/r/Lead/${raw.Id}/view`,
-      raw: raw
+      link: `https://${salesforceDomain}/lightning/r/Lead/${raw.Id}/view`
     };
 
     item.thumbnail = $.avatarLink(item.title, raw.Email);
     item.imageIsAvatar = true;
 
     if (includeStatus && raw.Status) item.statusText = raw.Status;
+
+    item.raw = raw;
 
     items.push(item);
   }
