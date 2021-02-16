@@ -16,6 +16,9 @@ module.exports = async (activity) => {
     activity.Response.Data.title = T(activity, 'Open Tickets by Priority');
     activity.Response.Data.link = `https://${api.getDomain()}/lightning/o/Case/list`;
     activity.Response.Data.linkLabel = T(activity, 'All Tickets');
+    activity.Response.Data._card = {
+      type: 'chart'
+    };
   } catch (error) {
     $.handleError(activity, error);
   }

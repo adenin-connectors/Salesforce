@@ -70,6 +70,9 @@ module.exports = async (activity) => {
     }
 
     activity.Response.Data = data;
+    activity.Response.Data._card = {
+      type: 'form',
+    };
   } catch (error) {
     $.handleError(activity, error);
   }
