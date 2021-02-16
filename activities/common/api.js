@@ -59,14 +59,15 @@ api.stream = (url, opts) => api(url, Object.assign({}, opts, {
 
 //** returns Salesforce domain in correct format */
 api.getDomain = function () {
-  let domain = _activity.Context.connector.custom1 || _activity.Context.connector.domain || '';
+  let domain = _activity.Context.connector.custom1 || _activity.Context.connector.domain || 'salesforce.com';
 
   domain = domain.replace('https://', '');
   domain = domain.replace('/', '');
 
-  if (domain && domain.charAt(domain.length - 1) !== '.') domain += '.';
-
-  if (!domain.includes('salesforce.com')) domain += 'salesforce.com';
+  if (domain && !domain.includes('salesforce.com')) {
+    if (domain.charAt(domain.length - 1) !== '.') domain += '.';
+    domain += 'salesforce.com';
+  }
 
   return domain;
 };
