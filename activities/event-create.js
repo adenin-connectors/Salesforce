@@ -47,7 +47,7 @@ module.exports = async (activity) => {
 
       default:
         var fname = __dirname + path.sep + "common" + path.sep + "event-create.form";
-        var schema = yaml.safeLoad(fs.readFileSync(fname, 'utf8'));
+        var schema = yaml.load(fs.readFileSync(fname, 'utf8'));
 
         data.title = T(activity, "Create Salesforce Event");
         data.formSchema = schema;
