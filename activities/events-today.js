@@ -65,6 +65,7 @@ module.exports = async (activity) => {
       activity.Response.Data.linkLabel = T(activity, 'All events');
       activity.Response.Data.thumbnail = 'https://www.adenin.com/assets/images/wp-images/logo/salesforce.svg';
       activity.Response.Data.actionable = value > 0;
+      activity.Response.Data.integration = 'Salesforce';
 
       if (value > 0) {
         const first = items[0];
@@ -80,6 +81,10 @@ module.exports = async (activity) => {
         activity.Response.Data.description = T(activity, 'You have no events today.');
       }
     }
+
+    activity.Response.Data._card = {
+      type: 'events-today'
+    };
   } catch (error) {
     $.handleError(activity, error);
   }
@@ -88,6 +93,8 @@ module.exports = async (activity) => {
 const urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
 
 function parseUrl(text) {
+  if (!text) return null;
+  
   text = text.replace(/\n|\r/g, ' ');
 
   if (text.search(urlRegex) !== -1) {
